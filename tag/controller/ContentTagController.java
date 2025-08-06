@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,6 +22,7 @@ public class ContentTagController {
 
     @Operation(summary = "Create a new content tag")
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN') or hasRole('ROOT')")
     public ContentTag create(@RequestBody ContentTag tag) {
         return contentTagService.create(tag);
     }
@@ -39,12 +41,14 @@ public class ContentTagController {
 
     @Operation(summary = "Update a content tag by ID")
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('ROOT')")
     public ContentTag update(@PathVariable Long id, @RequestBody ContentTag tag) {
         return contentTagService.update(id, tag);
     }
 
     @Operation(summary = "Delete a content tag by ID")
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('ROOT')")
     public void delete(@PathVariable Long id) {
         contentTagService.delete(id);
     }

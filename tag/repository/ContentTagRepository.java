@@ -24,11 +24,20 @@ public interface ContentTagRepository extends JpaRepository<ContentTag, Long>, J
     boolean existsByName(String name);
     boolean existsBySlug(String slug);
 
-    // Search tags by name or description
-    @Query("SELECT t FROM ContentTag t WHERE " +
-            "LOWER(t.name) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
-            "LOWER(t.description) LIKE LOWER(CONCAT('%', :keyword, '%'))")
-    Page<ContentTag> searchTags(@Param("keyword") String keyword, Pageable pageable);
+// // Search tags by name or description
+//     @Query("SELECT t FROM ContentTag t WHERE " +
+//        "LOWER(t.name) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+//        "LOWER(t.description) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+//        "LOWER(t.slug) LIKE LOWER(CONCAT('%', :keyword, '%'))")
+//         Page<ContentTag> searchTags(@Param("keyword") String keyword, Pageable pageable);
+//Thay thế ở trên bằng đoạn này để tìm kiếm không dấu...
+        @Query("SELECT t FROM ContentTag t WHERE " +
+       "LOWER(t.nameNormalized) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+       "LOWER(t.slugNormalized) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+       "LOWER(t.descriptionNormalized) LIKE LOWER(CONCAT('%', :keyword, '%'))")
+Page<ContentTag> searchTags(@Param("keyword") String keyword, Pageable pageable);
+
+
 
     // Find tags for specific document
     @Query(value = "SELECT ct.* FROM content_tags ct " +
@@ -40,7 +49,7 @@ public interface ContentTagRepository extends JpaRepository<ContentTag, Long>, J
     // Find tags by multiple IDs
     List<ContentTag> findByIdIn(List<Long> ids);
 
-
+    List<ContentTag> findContentTagByName(String tagName);
     /*
      * Projects's ContentTag 
      * 
@@ -63,7 +72,7 @@ public interface ContentTagRepository extends JpaRepository<ContentTag, Long>, J
             nativeQuery = true
         )
         Page<Project> findProjectsByTagIds(@Param("tagIds") List<Long> tagIds, Pageable pageable);
-
+        List<ContentTag> findByNameIn(List<String> contentTagNames);
         @Modifying
         @Query(value = "INSERT INTO taggables (tag_id, taggable_id, taggable_type) VALUES (:tagId, :projectId, :taggableType)",
                 nativeQuery = true)

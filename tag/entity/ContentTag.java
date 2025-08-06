@@ -12,6 +12,8 @@ import lombok.NoArgsConstructor;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonIgnore; //khia bao thu vien này để tránh lỗi vòng lặp vô hạn khi sử dụng Jackson để serialize/deserialize
+
 @Entity
 @Table(name = "content_tags")
 @Data
@@ -33,7 +35,17 @@ public class ContentTag extends BaseEntity {
     @Size(max = 500, message = "Description tối đa 500 ký tự")
     @Column(columnDefinition = "TEXT")
     private String description;
+    // // Lưu trữ các trường đã chuẩn hóa để tìm kiếm nhanh hơn (không dấu)
+    @Column(name = "name_normalized")
+    private String nameNormalized;
+
+    @Column(name = "slug_normalized")
+    private String slugNormalized;
+
+    @Column(name = "description_normalized")
+    private String descriptionNormalized;
 
     @OneToMany(mappedBy = "tag", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore // sử dụng @JsonIgnore để tránh vòng lặp vô hạn khi serialize/deserialize
     private Set<Taggable> taggables = new HashSet<>();
 }
